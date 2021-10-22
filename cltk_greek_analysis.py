@@ -19,9 +19,11 @@ import pandas as pd
 from pathlib import Path
 import csv
 import argparse
+import sys
+import os
 
 
-print('This software analyzes a csv file input and generates a csv output with metadata, using cltk \nusage: --src path/to/your/source/directory)
+print('This software analyzes a csv file input and generates a csv output with metadata, using cltk \nusage: --src path/to/your/source/directory')
 parser = argparse.ArgumentParser()
 parser.add_argument('--src', help= '/your/directory/to/csv/files/')
 args = parser.parse_args()
