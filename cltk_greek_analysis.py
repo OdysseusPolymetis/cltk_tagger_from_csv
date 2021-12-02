@@ -12,6 +12,8 @@ from cltk.alphabet.processes import GreekNormalizeProcess
 from cltk.ner.processes import GreekNERProcess
 from cltk.embeddings.processes import GreekEmbeddingsProcess
 from cltk.lexicon.processes import LatinLexiconProcess
+import nltk
+nltk.download('punkt')
 from nltk.tokenize import sent_tokenize
 from cltk.morphology.morphosyntax import CLTKException
 import glob
@@ -44,6 +46,8 @@ cltk_nlp_greek.pipeline.processes.remove(StopsProcess)
 cltk_nlp_greek.pipeline.processes.remove(GreekNERProcess)
 
 
+
+
 files= glob.iglob(author_grc+'/**/*.csv', recursive=True)
 headers=['Word','Lemma','POS','Case','Gender','Number','Aspect','Tense','VerbForm','Voice']
 features=['Case','Gender','Number','Aspect','Tense','VerbForm','Voice']
@@ -52,11 +56,13 @@ for filename in files :
     if os.path.exists('./results/')==False:
         os.mkdir('./results/')
     with open('./results/'+path+'.csv', 'w', newline='') as outcsv:
+        number_occurrences=0
         writer = csv.writer(outcsv)
         writer.writerow(headers)
         print(filename)
         df = pd.read_csv(filename, sep='\t')
         words = df['word'].tolist()
+        print("Il y a "+str(len(words))+" formes à analyser.")
         gktxt = " ".join(words)
         for sent in sent_tokenize(gktxt):
             cltk_doc = cltk_nlp_greek.analyze(text=sent)
@@ -70,4 +76,7 @@ for filename in files :
                         row.append(word.features[feature])
                     except CLTKException:
                         row.append("")
-            writer.writerow(row)
+                writer.writerow(row)
+                number_occurrences+=1
+                if number_occurrences % 1000 == 0:
+                    print("Formes analysées : "+str(number_occurrences)+"/"+str(len(words)))
